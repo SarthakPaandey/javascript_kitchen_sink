@@ -3,4 +3,5 @@
         root_id: "chessboard-ct"
     });
     board.initiateGame();
+    window.chessBoard = board;
 })()

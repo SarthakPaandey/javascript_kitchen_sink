@@ -57,20 +57,19 @@ Board.prototype.clearSelection = function(){
     });
 };
 
-Board.prototype.boardClicked = function(event){    
-    this.clearSelection();    
+Board.prototype.boardClicked = function(event) {
+    this.clearSelection();
     const clickedCell = this.getClickedBlock(event);
-    const selectedPiece = this.getPieceAt(clickedCell)
-    if(selectedPiece){
-        //Add 'selected' class to the clicked piece    
+    const selectedPiece = this.getPieceAt(clickedCell);
+
+    if (selectedPiece) {
         this.selectPiece(event.target, selectedPiece);
-    }else{
-        //update position of the selected piece to new position
-        if(this.selectedPiece){
-            this.selectedPiece.moveTo(clickedCell);        
-        }                
-    }    
-}
+    } else if (this.selectedPiece) {
+        if (this.selectedPiece.moveTo(clickedCell)) {
+            this.selectedPiece = null;
+        }
+    }
+};
 
 Board.prototype.getPieceAt = function(cell){
     if (!cell || !cell.row || !cell.col) {
@@ -198,4 +197,28 @@ Board.prototype.renderAllPieces = function() {
             piece.render();
         }
     });
+};
+
+Board.prototype.isPathClear = function(startPos, endPos) {
+    const startCol = startPos[0].charCodeAt(0);
+    const startRow = parseInt(startPos[1]);
+    const endCol = endPos.col.charCodeAt(0);
+    const endRow = parseInt(endPos.row);
+
+    const colStep = Math.sign(endCol - startCol);
+    const rowStep = Math.sign(endRow - startRow);
+
+    let currentCol = startCol + colStep;
+    let currentRow = startRow + rowStep;
+
+    while (currentCol !== endCol || currentRow !== endRow) {
+        const currentPos = String.fromCharCode(currentCol) + currentRow;
+        if (this.getPieceAt({col: String.fromCharCode(currentCol), row: currentRow})) {
+            return false;
+        }
+        currentCol += colStep;
+        currentRow += rowStep;
+    }
+
+    return true;
 };
